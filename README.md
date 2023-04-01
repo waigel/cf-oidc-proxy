@@ -48,3 +48,31 @@ curl https://api.cloudflare.com/client/v4/user/tokens/permission_groups -H "Auth
   - "StringNotEqualsIgnoreCase"
 - Claims:
   You can use matchers for all JWT claims. https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/about-security-hardening-with-openid-connect#understanding-the-oidc-token
+  
+  
+# Action
+
+You can use this CF-OIDC-Proxy in combination with the [waigel/cf-oidc-proxy-action@main](https://github.com/waigel/cf-oidc-proxy-action)
+Example Workflow to get Cloudflare short-lived api token over OIDC proxy:
+```ỳml
+name: Cloudflare OIDC Test
+on:
+  workflow_dispatch:
+  
+permissions:
+  id-token: write
+jobs:
+  cloudflare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: waigel/cf-oidc-proxy-action@main
+        id: cloudflare
+        with:
+          proxy-url: https://<lambda-id>.execute-api.eu-central-1.amazonaws.com
+          role-to-assume: dns
+      - name: Verify API token is valid
+        run: |
+          curl "https://api.cloudflare.com/client/v4/user/tokens/verify" \
+          -H  "Authorization: Bearer ${{ steps.cloudflare.outputs.api_token }}" \
+          | grep -o '"message":"[^"]*"' | sed 's/"message":"\(.*\)"/\1/
+```
