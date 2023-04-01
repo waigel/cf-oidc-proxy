@@ -9,7 +9,7 @@
     "build:start": "npm run build && npm run start",
     "watch": "nodemon --watch ./ -e go,js --exec npm run build:start",
     "deploy": "npm run build && sls deploy --stage prod",
-    "release": "cd ./bin && semantic-release"
+    "release": "semantic-release"
   },
   "repository": {
     "type": "git",
