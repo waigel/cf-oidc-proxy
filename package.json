@@ -1,6 +1,6 @@
 {
   "name": "cf-oidc-proxy",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Connect GitHub Actions OIDC with Cloudflare by using CF-OIDC-Proxy",
   "main": "index.js",
   "scripts": {
