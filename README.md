@@ -54,7 +54,7 @@ curl https://api.cloudflare.com/client/v4/user/tokens/permission_groups -H "Auth
 
 You can use this CF-OIDC-Proxy in combination with the [waigel/cf-oidc-proxy-action@main](https://github.com/waigel/cf-oidc-proxy-action)
 Example Workflow to get Cloudflare short-lived api token over OIDC proxy:
-```ỳml
+```yaml
 name: Cloudflare OIDC Test
 on:
   workflow_dispatch:
