@@ -32,59 +32,61 @@ func GenerateResponseStatusCode(Code int) events.APIGatewayProxyResponse {
 }
 
 func HandleRequest(_ context.Context, request events.LambdaFunctionURLRequest) (events.APIGatewayProxyResponse, error) {
-	fmt.Printf("request: %v\n", request.Body)
 	requestBody, err := pareRequestBody(request)
 	if err != nil {
 		fmt.Printf("error parsing request body: %v\n", err)
 		return GenerateResponseStatusCode(400), nil
 	}
-	groupName := requestBody.AssumeGroup
+	roleName := requestBody.RoleToAssume
 	authorizationHeader := request.Headers["Authorization"]
 	addr := strings.Split(request.Headers["X-Forwarded-For"], ",")
 
 	// Load the configuration
+	fmt.Println("Loading configuration")
 	cfg, err := config.LoadConfiguration()
 	if err != nil {
 		fmt.Printf("error loading configuration: %v\n", err)
 		return GenerateResponseStatusCode(500), nil
 	}
 
-	// Load the group configuration
-	gcfg, err := config.LoadRoleConfiguration()
+	// Load the role configuration
+	fmt.Println("Loading roles configuration")
+	rcfg, err := config.LoadRoleConfiguration()
 	if err != nil {
-		fmt.Printf("error loading group configuration: %v\n", err)
+		fmt.Printf("error loading role configuration: %v\n", err)
 		return GenerateResponseStatusCode(500), nil
 	}
 
 	// Validate the authorization header and return the id token
+	fmt.Println("Validating authorization header")
 	idToken, err := validateAuthorization(authorizationHeader, cfg.OidcProxy.Issuer)
 	if err != nil {
 		fmt.Printf("error validating authorization: %v\n", err)
 		return GenerateResponseStatusCode(401), nil
 	}
 
-	// Search group by name in the group configuration
-	group, err := gcfg.GetRoleByName(groupName)
+	// Search role by name in the group configuration
+	group, err := rcfg.GetRoleByName(roleName)
 	if err != nil {
 		return GenerateResponseStatusCode(400), nil
 	}
 
 	// Match the claims with configure
-	match, err := validators.GroupEntityMatcher(*gcfg, groupName, idToken)
+	match, err := validators.RoleEntityMatcher(*rcfg, roleName, idToken)
 	if match != true || err != nil {
 		fmt.Printf("error id token not match with requested group")
 		return GenerateResponseStatusCode(401), nil
 	}
-
+	fmt.Printf("id token match with requested group: %v\n", match)
 	// Create Cloudflare client to interact with the cloudflare API
-	cfClient, err := services.NewCloudflareClient(cfg.OidcProxy.Cloudflare.ApiToken)
+	cfClient, err := services.NewCloudflareClient(cfg.OidcProxy)
 	if err != nil {
 		fmt.Printf("error creating cloudflare client: %v\n", err)
 		return GenerateResponseStatusCode(500), nil
 	}
 
 	// Create a short-lived token with the group and the configured permissions
-	token, err := cfClient.CreateShortLivedToken(group, groupName, addr)
+	token, err := cfClient.CreateShortLivedToken(group, roleName, addr)
 	if err != nil {
 		fmt.Printf("error creating cloudflare short lived token: %v\n", err)
 		return GenerateResponseStatusCode(500), nil
@@ -108,7 +110,7 @@ func validateAuthorization(authorizationHeader string, issuer string) (idToken *
 
 	skipExpiryCheck := os.Getenv("SKIP_EXPIRY_CHECK") == "true"
 	if skipExpiryCheck == true {
-		fmt.Printf("!!!!!! DANGEROUS: Skipping expiry check !!!!!!!")
+		fmt.Printf("\n!!!!!! DANGEROUS: Skipping expiry check !!!!!!!\n")
 	}
 
 	provider, err := oidc.NewProvider(context.Background(), issuer)

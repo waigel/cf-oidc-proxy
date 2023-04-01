@@ -1,4 +1,4 @@
 oidc-proxy:
   issuer: https://token.actions.githubusercontent.com
   cloudflare:
-    apiToken: <token>
+   # apiToken: <token | or delete and use env CF_GLOBAL_API_TOKEN>

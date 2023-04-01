@@ -48,27 +48,28 @@ type Role struct {
 }
 
 type RoleConfig struct {
-	Roles []Role `yaml:"groups" validate:"required"`
+	Roles []Role `yaml:"roles" validate:"required"`
 }
 
 func (cfg *RoleConfig) GetRoleByName(name string) (foundGroup *Role, err error) {
 	match := false
-	group := &Role{}
+	role := &Role{}
 	for _, groups := range cfg.Roles {
 		if groups.Name == name {
-			group = &groups
+			role = &groups
 			match = true
 			break
 		}
 	}
-	if (group == &Role{} || group == nil) || !match {
+	if (role == &Role{} || role == nil) || !match {
 		return nil, fmt.Errorf("role %s not found in config", name)
 	}
-	return group, nil
+	return role, nil
 }
 
 func LoadRoleConfiguration() (config *RoleConfig, err error) {
 	configPath := os.Getenv("ROLES_CONFIG_PATH")
+	fmt.Println("Using config file: " + configPath)
 	configFile, err := os.ReadFile(configPath)
 	if err != nil {
 		return nil, fmt.Errorf("error reading config file: %s", err)

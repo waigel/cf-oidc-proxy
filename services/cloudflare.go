@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/cloudflare/cloudflare-go"
 	"net"
+	"os"
 	"strings"
 	"time"
 )
@@ -15,7 +16,12 @@ type CloudflareClient struct {
 	ctx context.Context
 }
 
-func NewCloudflareClient(apiToken string) (cloudflareClient *CloudflareClient, err error) {
+func NewCloudflareClient(config config.OidcProxy) (cloudflareClient *CloudflareClient, err error) {
+	apiToken := os.Getenv("CF_GLOBAL_API_TOKEN")
+	if config.Cloudflare != nil && config.Cloudflare.ApiToken != nil {
+		apiToken = *config.Cloudflare.ApiToken
+	}
+
 	api, err := cloudflare.NewWithAPIToken(apiToken)
 	if err != nil {
 		return nil, fmt.Errorf("error creating cloudflare client: %s", err)
@@ -26,15 +32,15 @@ func NewCloudflareClient(apiToken string) (cloudflareClient *CloudflareClient, e
 
 // CreateShortLivedToken Request short-lived api tokens that are limited to scopes, ressources and ttl
 // Optional client ip whitelisting can be enabled
-func (cf *CloudflareClient) CreateShortLivedToken(group *config.Role, groupName string, oidcActorRequestIPs []string) (apiToken *cloudflare.APIToken, err error) {
-	ttl := calculateTtlTime(group.TTL)
-	condition := createConditions(group, oidcActorRequestIPs)
+func (cf *CloudflareClient) CreateShortLivedToken(role *config.Role, groupName string, oidcActorRequestIPs []string) (apiToken *cloudflare.APIToken, err error) {
+	ttl := calculateTtlTime(role.TTL)
+	condition := createConditions(role, oidcActorRequestIPs)
 	request := cloudflare.APIToken{
 		Name:      groupName,
 		Value:     "empty",
 		ExpiresOn: &ttl,
 		Condition: condition,
-		Policies:  createPolicies(group),
+		Policies:  createPolicies(role),
 	}
 	token, err := cf.api.CreateAPIToken(context.Background(), request)
 	if err != nil {

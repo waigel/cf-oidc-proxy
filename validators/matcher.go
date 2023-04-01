@@ -7,12 +7,12 @@ import (
 	"strings"
 )
 
-func GroupEntityMatcher(cfg config.RoleConfig, groupName string, idToken *oidc.IDToken) (match bool, err error) {
-	group, err := cfg.GetRoleByName(groupName)
+func RoleEntityMatcher(cfg config.RoleConfig, roleName string, idToken *oidc.IDToken) (match bool, err error) {
+	role, err := cfg.GetRoleByName(roleName)
 	if err != nil {
 		return false, err
 	}
-	matchers := group.Entities.Matchers
+	matchers := role.Entities.Matchers
 	claims := map[string]string{}
 	idToken.Claims(&claims)
 
