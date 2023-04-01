@@ -76,5 +76,5 @@ jobs:
           -H  "Authorization: Bearer ${{ steps.cloudflare.outputs.api_token }}" \
           | grep -o '"message":"[^"]*"' | sed 's/"message":"\(.*\)"/\1/
 ```
-
+---
 Licensed under MIT.
