@@ -77,4 +77,4 @@ jobs:
           | grep -o '"message":"[^"]*"' | sed 's/"message":"\(.*\)"/\1/
 ```
 ---
-Licensed under MIT.
+Licensed under MIT License.
