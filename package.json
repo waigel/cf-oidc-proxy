@@ -1,0 +1,30 @@
+{
+  "name": "cf-oidc-proxy",
+  "version": "1.0.0",
+  "description": "Connect GitHub Actions OIDC with Cloudflare by using CF-OIDC-Proxy",
+  "main": "index.js",
+  "scripts": {
+    "build": "env GOOS=linux GOARCH=amd64  go build  -o bin/cf-oidc-proxy .",
+    "start": "sls offline start --useDocker",
+    "build:start": "npm run build && npm run start",
+    "watch": "nodemon --watch ./ -e go,js --exec npm run build:start",
+    "deploy": "npm run build && sls deploy --stage prod"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/waigel/cf-oidc-proxy.git"
+  },
+  "author": "Johannes Waigel <johannes@waigel.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/waigel/cf-oidc-proxy/issues"
+  },
+  "homepage": "https://github.com/waigel/cf-oidc-proxy#readme",
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "env-cmd": "^10.1.0",
+    "nodemon": "^2.0.22",
+    "serverless-offline": "^6.0.0-alpha.67",
+    "serverless-better-credentials": "^1.1.3"
+  }
+}

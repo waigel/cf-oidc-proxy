@@ -1,0 +1,22 @@
+roles:
+  - name: dns
+    conditions:
+      request-ip:
+        allow-oidc-actor: true
+        whitelist:
+          - 127.0.0.1/32
+    ttl: 60
+    policies:
+      - name: "test-policy"
+        effect: Allow
+        permissions:
+            - name: "DNS Write"
+              id: "4755a26eedb94da69e1066d98aa820be"
+        resources:
+          - name: "com.cloudflare.api.account.zone.<zone-id>"
+            value: "*"
+    entities:
+      matchers:
+        - operator: StringEquals
+          claims:
+            sub: repo:octa/octa-test:ref:refs/heads/*

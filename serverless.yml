@@ -1,0 +1,49 @@
+service: services-oidc-proxy
+provider:
+  name: aws
+  runtime: go1.x
+  region: eu-central-1
+  stage: ${opt:stage, 'dev'}
+  environment:
+    SKIP_EXPIRY_CHECK: ${self:custom.skipExpiryCheck.${opt:stage, self:provider.stage}}
+    GENERAL_CONFIG_PATH: ${self:custom.generalConfigPath.${opt:stage, self:provider.stage}}
+    ROLES_CONFIG_PATH: ${self:custom.rolesConfigPath.${opt:stage, self:provider.stage}}
+
+package:
+  patterns:
+    - "!./**"
+    - "./bin/**"
+    - "./*.yml"
+    - "./samples/*.yml"
+
+useDotenv: true
+
+plugins:
+  - serverless-offline
+  - serverless-better-credentials
+
+
+custom:
+  serverless-offline:
+    httpPort: 8900
+  skipExpiryCheck:
+    dev: true
+    prod: false
+  generalConfigPath:
+    dev: ./samples/config.yml
+    prod: ./config.yml
+  rolesConfigPath:
+    dev: ./samples/roles.yml
+    prod: ./roles.yml
+
+
+
+functions:
+  cf-oidc-proxy:
+    handler: bin/cf-oidc-proxy
+    events:
+      - http:
+          path: /openid-connect
+          method: post
+          cors: true
+          private: false
