@@ -8,7 +8,7 @@ OIDC is an optimal solution to this problem. However, Cloudflare does not suppor
 
 To solve this problem, the CF-OIDC-Proxy acts as a middleware between Cloudflare and GitHub OIDC, allowing the issuance of short-living API tokens with limited permissions and additional conditions like IP address whitelisting for workers.
 
-## Using?
+## Usage
 
 The proxy server is only required when GitHub Actions requests a Cloudflare API token. To protect the environment and your wallet, a Lambda-based serverless application was written that can be deployed to the cloud via "serverless."
 
