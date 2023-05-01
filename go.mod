@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/aws/aws-lambda-go v1.40.0
-	github.com/cloudflare/cloudflare-go v0.65.0
+	github.com/cloudflare/cloudflare-go v0.66.0
 	github.com/coreos/go-oidc/v3 v3.5.0
 	github.com/go-playground/validator/v10 v10.12.0
 	github.com/zitadel/oidc/v2 v2.5.0
