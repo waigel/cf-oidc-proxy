@@ -7,7 +7,7 @@ require (
 	github.com/cloudflare/cloudflare-go v0.65.0
 	github.com/coreos/go-oidc/v3 v3.5.0
 	github.com/go-playground/validator/v10 v10.12.0
-	github.com/zitadel/oidc/v2 v2.5.0
+	github.com/zitadel/oidc/v2 v2.6.0
 	gopkg.in/square/go-jose.v2 v2.6.0
 	gopkg.in/yaml.v3 v3.0.1
 )
